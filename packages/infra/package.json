@@ -11,7 +11,7 @@
     "deploy": "cdk deploy --all"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.173.2",
+    "aws-cdk-lib": "2.262.2",
     "constructs": "10.4.2",
     "source-map-support": "0.5.21"
   },
