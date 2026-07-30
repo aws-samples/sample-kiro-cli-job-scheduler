@@ -1,4 +1,4 @@
-import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
+import type { APIGatewayProxyEventV2, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import { handler as authHandler } from "./handlers/auth";
 import { handler as apiKeyHandler } from "./handlers/api-key";
 import { handler as agentsHandler } from "./handlers/agents";
@@ -44,7 +44,7 @@ function toV1Event(event: APIGatewayProxyEventV2): any {
   };
 }
 
-export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyResultV2> {
+export async function handler(event: APIGatewayProxyEventV2): Promise<APIGatewayProxyStructuredResultV2> {
   const path = event.rawPath;
   const v1Event = toV1Event(event);
 

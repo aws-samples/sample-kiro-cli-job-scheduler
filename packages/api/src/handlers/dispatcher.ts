@@ -22,6 +22,17 @@ interface DispatchEvent {
   triggerType: "scheduled" | "manual";
 }
 
+interface AgentConfig {
+  name?: string;
+  description?: string;
+  prompt?: string;
+  model?: string;
+  tools?: string[];
+  allowedTools?: string[];
+  skillIds?: string[];
+  mcpServerIds?: string[];
+}
+
 export async function handler(event: DispatchEvent): Promise<{ executionId: string }> {
   const { jobId, userId, triggerType } = event;
 
@@ -36,7 +47,7 @@ export async function handler(event: DispatchEvent): Promise<{ executionId: stri
     "default-planner": "kiro_planner",
   };
 
-  let agent: Record<string, unknown>;
+  let agent: AgentConfig;
   let builtinAgentName: string | null = null;
 
   if (BUILTIN_AGENTS[job.agentId]) {
@@ -47,7 +58,7 @@ export async function handler(event: DispatchEvent): Promise<{ executionId: stri
       TableName: TABLES.agents,
       Key: { userId, agentId: job.agentId },
     }));
-    agent = agentResult.Item as Record<string, unknown>;
+    agent = agentResult.Item as AgentConfig;
     if (!agent) throw new Error(`Agent ${job.agentId} not found`);
   }
 
@@ -85,7 +96,7 @@ export async function handler(event: DispatchEvent): Promise<{ executionId: stri
   const agentJson: KiroAgentJson = {
     name: "job-agent",
     description: agent.description,
-    prompt: agent.prompt,
+    prompt: agent.prompt ?? "",
     model: agent.model,
     tools: agent.tools ?? ["*"],
     allowedTools: agent.allowedTools ?? ["*"],
