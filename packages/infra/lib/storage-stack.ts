@@ -498,10 +498,11 @@ function handler(event) {
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.HTTPS_ONLY,
           allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
           cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
-          originRequestPolicy: new cloudfront.OriginRequestPolicy(this, "ApiOriginPolicy", {
-            headerBehavior: cloudfront.OriginRequestHeaderBehavior.allowList("Authorization", "Content-Type"),
-            queryStringBehavior: cloudfront.OriginRequestQueryStringBehavior.all(),
-          }),
+          // Forward all viewer headers (incl. Authorization) and query strings to the
+          // API Gateway origin, except Host (API Gateway requires its own execute-api
+          // host). CloudFront disallows forwarding Authorization via an explicit
+          // OriginRequestPolicy allow-list, so use this managed policy instead.
+          originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
         },
       },
       errorResponses: [
@@ -525,6 +526,6 @@ function handler(event) {
     new cdk.CfnOutput(this, "SnsTopicArn", { value: notificationsTopic.topicArn });
     new cdk.CfnOutput(this, "ApiEndpoint", { value: httpApi.apiEndpoint });
     new cdk.CfnOutput(this, "CloudFrontDomain", { value: distribution.distributionDomainName });
-    new cdk.CfnOutput(this, "FrontendBucket", { value: frontendBucket.bucketName });
+    new cdk.CfnOutput(this, "FrontendBucketName", { value: frontendBucket.bucketName });
   }
 }
