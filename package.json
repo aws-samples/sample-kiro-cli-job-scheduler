@@ -1,0 +1,31 @@
+{
+  "name": "kiro-job-scheduler",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r clean"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "8.19.1",
+    "@typescript-eslint/parser": "8.19.1",
+    "eslint": "9.17.0",
+    "playwright": "^1.60.0",
+    "typescript": "5.7.3"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "unrs-resolver"
+    ],
+    "overrides": {
+      "glob@10.3.10": "10.5.0",
+      "fast-xml-parser@4.4.1": "4.5.7"
+    }
+  }
+}

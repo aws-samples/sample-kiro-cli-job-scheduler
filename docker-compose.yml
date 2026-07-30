@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  localstack:
+    image: localstack/localstack:3.8
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,s3,secretsmanager,sns,sqs
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - "./docker/localstack-init.sh:/etc/localstack/init/ready.d/init.sh"
+      - localstack_data:/var/lib/localstack
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DYNAMODB_ENDPOINT=http://localstack:4566
+      - S3_ENDPOINT=http://localstack:4566
+      - SECRETS_ENDPOINT=http://localstack:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - USERS_TABLE=kiro-scheduler-users
+      - JOBS_TABLE=kiro-scheduler-jobs
+      - AGENTS_TABLE=kiro-scheduler-agents
+      - SKILLS_TABLE=kiro-scheduler-skills
+      - MCP_SERVERS_TABLE=kiro-scheduler-mcp-servers
+      - EXECUTIONS_TABLE=kiro-scheduler-executions
+      - S3_OUTPUT_BUCKET=kiro-scheduler-outputs
+      - IS_LOCAL=true
+    depends_on:
+      - localstack
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - api
+
+  worker:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    environment:
+      - S3_OUTPUT_BUCKET=kiro-scheduler-outputs
+      - EXECUTIONS_TABLE=kiro-scheduler-executions
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - HOME=/tmp
+      - NO_COLOR=1
+    depends_on:
+      - localstack
+
+volumes:
+  localstack_data:

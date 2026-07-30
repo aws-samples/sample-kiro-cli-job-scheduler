@@ -1,0 +1,10 @@
+region      = "us-east-1"
+project     = "kiro-scheduler"
+environment = "prod"
+
+# Email domain allowed for Cognito user registration
+allowed_email_domain = "amazon.com"
+
+# To use an existing VPC, uncomment and fill in:
+# existing_vpc_id     = "vpc-0123456789abcdef0"
+# existing_subnet_ids = ["subnet-aaa", "subnet-bbb"]
